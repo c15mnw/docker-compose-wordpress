@@ -12,8 +12,9 @@ services:
     ports:
       - 80:80
       - 443:443
+    working_dir: /var/www/html/my-wordpress
     volumes:
-      - ./wordpress:/var/www/html:delegated
+      - ./wordpress:/var/www/html/my-wordpress:delegated
     depends_on:
       - php
       - mysql
@@ -25,7 +26,7 @@ services:
     container_name: mysql
     restart: always
     ports:
-      - 3306:3306
+      - 3308:3308
     environment:
       MYSQL_DATABASE: wp
       MYSQL_USER: wp
@@ -35,14 +36,17 @@ services:
       SERVICE_NAME: mysql
     networks:
       - wordpress
+    volumes:
+      - ./mysql:/var/lib/mysql
 
   php:
     build:
       context: .
       dockerfile: php.dockerfile
     container_name: php
+    working_dir: /var/www/html/my-wordpress
     volumes:
-      - ./wordpress:/var/www/html:delegated
+      - ./wordpress:/var/www/html/my-wordpress:delegated
     networks:
       - wordpress
 
@@ -52,7 +56,8 @@ services:
       dockerfile: php.dockerfile
     container_name: wp
     entrypoint: ['wp', '--allow-root']
+    working_dir: /var/www/html/my-wordpress
     volumes:
-      - ./wordpress:/var/www/html:delegated
+      - ./wordpress:/var/www/html/my-wordpress:delegated
     networks:
       - wordpress
